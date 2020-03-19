@@ -25,11 +25,18 @@ dependencies:
   curved_navigation_bar: ^0.3.1
   cupertino_icons: ^0.1.2
   cloud_firestore: ^0.13.3
+
   sliding_up_panel: ^1.0.0
   flutter_clean_calendar: ^1.0.1
   draggable_floating_button: ^0.1.1
+  firebase_auth: ^0.14.0+5
+  rflutter_alert: ^1.0.3
+  firebase_core: ^0.4.1+3
   table_calendar: ^2.2.2
+  font_awesome_flutter: ^8.2.0
   flutter_speed_dial: 
+  shared_preferences: 
+  progress_dialog: ^1.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -53,6 +60,8 @@ flutter:
     - assets/red_dot.png
     - assets/navigation_image.png
     - assets/Aniket.jpg
+    - assets/blood.png
+    - assets/school.png 
   fonts:
     - family: RobotoSlab
       fonts:

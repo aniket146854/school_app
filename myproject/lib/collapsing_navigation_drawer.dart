@@ -1,3 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myproject/login_page.dart';
+
 import 'custom_navigation_drawer.dart';
 import 'package:flutter/material.dart';
 
@@ -53,6 +56,10 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                   return CollapsingListTile(
                       onTap: () {
                         setState(() {
+                          if(counter == 4) {
+                            signoutAccount();
+                            
+                          }
                           currentSelectedIndex = counter;
                         });
                       },
@@ -88,5 +95,9 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
         ),
       ),
     );
+  }
+  signoutAccount() async{
+    FirebaseAuth.instance.signOut();
+    Navigator.push(context, MaterialPageRoute(builder: (context) => loginPage()));
   }
 }

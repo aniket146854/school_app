@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:myproject/FirstPage.dart';
 import 'package:myproject/calendar.dart';
 import 'package:myproject/homepage.dart';
+import 'package:myproject/login_page.dart';
 import 'package:myproject/mypofile.dart';
 import 'package:myproject/top_bar.dart';
 import 'collapsing_navigation_drawer.dart';
@@ -11,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:async';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'notice.dart';
 
@@ -18,6 +21,7 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
   static Map<int, Color> color = {
     50: Color.fromRGBO(136, 14, 79, .1),
     100: Color.fromRGBO(136, 14, 79, .2),
@@ -48,7 +52,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: FirstPage(),
     );
   }
 }
@@ -66,6 +70,13 @@ class _MyHomePageState extends State<MyHomePage> {
   int _page = 0;
   int pageindex = 0;
 
+  @override 
+  void initState() {
+    printValues();
+    // TODO: implement initState
+    super.initState();
+  }
+  
   final homepage _myhomepage = homepage();
   final notice _mynoticepage = notice();
   final myprofile _myprofilepage = myprofile();
@@ -125,5 +136,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         
      );
+  }
+
+  printValues() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String name = prefs.getString('name');
+    print(name);
   }
 }

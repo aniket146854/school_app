@@ -2,17 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:myproject/narrow_app_bar.dart';
 import 'package:draggable_floating_button/draggable_floating_button.dart';
 
-class noticeDescription extends StatefulWidget {
-  String text;
-  noticeDescription({Key key, @required this.text}) : super(key: key);
-  @override
-  noticeDescriptionState createState() {
-    return new noticeDescriptionState(text: text);
-  }
-}
-class noticeDescriptionState extends State<noticeDescription> {
-  String text;
-  noticeDescriptionState({Key key, @required this.text});
+class noticeDescription extends StatelessWidget {
+  String index, subject, sender, description, sendto;
+  noticeDescription({Key key, @required this.index, @required this.sendto, @required this.description, @required this.sender, @required this.subject}) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +48,7 @@ class noticeDescriptionState extends State<noticeDescription> {
                 top: 30.0,
                 left: (MediaQuery.of(context).size.width / 2) - 75.0,
                 child: Hero( 
-                  tag: "Demo Tag" + text,
+                  tag: "Demo Tag" + index,
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -88,7 +81,7 @@ class noticeDescriptionState extends State<noticeDescription> {
                         Expanded(
                          child:Container(
                               margin: EdgeInsets.only(left: 5.0, top: 10.0),
-                              child: Text("Aniket Madam", style: TextStyle(fontSize :17.0)),
+                              child: Text(sender, style: TextStyle(fontSize :17.0)),
                           ),
                         ),
                       ]
@@ -106,7 +99,7 @@ class noticeDescriptionState extends State<noticeDescription> {
                         Expanded(
                          child:Container(
                               margin: EdgeInsets.only(left: 5.0, top: 10.0),
-                              child: Text("Std 5th", style: TextStyle(fontSize :17.0)),
+                              child: Text(getwhomsent(sendto), style: TextStyle(fontSize :17.0)),
                           ),
                         ),
                       ]
@@ -123,7 +116,7 @@ class noticeDescriptionState extends State<noticeDescription> {
                         Expanded(
                          child:Container(
                               margin: EdgeInsets.only(left: 5.0, top: 10.0),
-                              child: Text("About Weather", style: TextStyle(fontSize :17.0)),
+                              child: Text(subject, style: TextStyle(fontSize :17.0)),
                           ),
                         ),
                       ]
@@ -138,7 +131,7 @@ class noticeDescriptionState extends State<noticeDescription> {
                   child: SingleChildScrollView(
                   child: Container(
                       margin: EdgeInsets.only(left: 5.0, top: 10.0, right: 3.0),
-                      child: Text("It is about today's weather! It is about today's weather It's all about today's weather It is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weatherIt is about today's weather! It is about today's weather It's all about today's weather It is about today's weather! It is about today's weather", style: TextStyle(fontSize :17.0)),
+                      child: Text(description, style: TextStyle(fontSize :17.0)),
                   ),
                   )
                   ),
@@ -150,5 +143,13 @@ class noticeDescriptionState extends State<noticeDescription> {
       ),
       
     );
+  }
+  getwhomsent(String text) {
+    if(text == 'all') {
+      return "to all";
+    }
+    else {
+      return "standard "+ text; 
+    }
   }
 }
