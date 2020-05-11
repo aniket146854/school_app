@@ -9,7 +9,7 @@ class NarrowAppBar extends StatelessWidget with PreferredSizeWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        color: Color(0xFF7A9BEE),
+      color: Color(0xFF7A9BEE),
       child: Padding(
         padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
         child: Row(

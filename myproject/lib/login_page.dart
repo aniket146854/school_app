@@ -30,6 +30,7 @@ class _MyHomePageState extends State<loginPage> {
   String verificationId;
   int flag = 0;
   bool myflag;
+  static String role;
   TextEditingController _controller  = TextEditingController();
   
   Future<void> verifyPhone() async {
@@ -109,6 +110,12 @@ class _MyHomePageState extends State<loginPage> {
            smsCode: smsCode,
           );
       
+          String myphoneNo = this.phoneNo.substring(3);
+          print(myphoneNo);
+          var datasnapshot = await Firestore.instance.collection('Users').where('mobile', isEqualTo: myphoneNo).getDocuments();
+          role = datasnapshot.documents[0]['Role'];
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('role', role);
           FirebaseAuth _auth = FirebaseAuth.instance;
           final FirebaseUser user =
           await _auth.signInWithCredential(credential).then((user) {
@@ -127,7 +134,6 @@ class _MyHomePageState extends State<loginPage> {
 
             pr.show();
 
-            
             Navigator.push(context, MaterialPageRoute(builder: (context)=> MyHomePage()));
             print("Authentication Successful!");
           }).catchError((e) {

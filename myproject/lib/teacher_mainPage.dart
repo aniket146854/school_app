@@ -19,6 +19,7 @@ import 'notice.dart';
 
 void main() => runApp(MyApp());
 
+GlobalKey globalkey = new GlobalKey(debugLabel: 'btml_app_bar');
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
@@ -109,7 +110,8 @@ class _MyHomePageState extends State<MyHomePage> {
      return Scaffold(
       drawer: CollapsingNavigationDrawer(),
       bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: const Color(0xff207FF2),
+        key: globalkey,
+        backgroundColor: Colors.indigoAccent.withOpacity(0.8),
         buttonBackgroundColor: Colors.white,
         height: 45.0,
         animationDuration: Duration(
@@ -124,6 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
           onTap: (tappedIndex) {
             setState(() {
+              print("hello");
               _showPage = _pagechooser(tappedIndex);
             });
           },       

@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:myproject/homepage.dart';
+import 'package:myproject/main.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
@@ -20,13 +23,13 @@ class myCalendar extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.indigo,
       ),
-      home: MyHomePage(title: 'Calendar'),
+      home: MyCalendarPage(title: 'Calendar'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class MyCalendarPage extends StatefulWidget {
+  MyCalendarPage({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -34,7 +37,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+class _MyHomePageState extends State<MyCalendarPage> with TickerProviderStateMixin {
   bool dialVisible = true;
   static bool flag = true;
   Map<DateTime, List> _events = Map<DateTime, List>();
@@ -308,11 +311,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   
         @override
         Widget build(BuildContext context) {
-          return WillPopScope(
-            onWillPop: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => homepage()));
-            },
-          child: Scaffold(
+          return Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.indigoAccent,
               title: Text(widget.title),
@@ -366,12 +365,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   ); 
                 }
                 else {
-                  return Container();
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.redAccent,
+                    )
+                  );
                 }
               }
             ),),
             floatingActionButton: buildSpeedDial(),
-          ));
+          );
       
         // Simple TableCalendar configuration (using Styles)
       
