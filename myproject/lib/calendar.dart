@@ -5,8 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:myproject/homepage.dart';
 import 'package:myproject/main.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+
+import 'addEvent.dart';
 
 
 // Example holidays
@@ -43,12 +47,19 @@ class _MyHomePageState extends State<MyCalendarPage> with TickerProviderStateMix
   Map<DateTime, List> _events = Map<DateTime, List>();
   Map<DateTime, List> _holidays = Map<DateTime, List>();
   List _selectedEvents = List();
+  SharedPreferences prefs;
+  String role;
   AnimationController _animationController;
   CalendarController _calendarController;
   final _selectedDay = DateTime.now();
   @override
   void initState() {
-
+          SharedPreferences.getInstance().then((onValue) {
+          setState(() {
+            prefs = onValue;
+            role = prefs.getString('role');
+          });
+        });
           _calendarController = CalendarController();
       
           _animationController = AnimationController(
@@ -311,7 +322,113 @@ class _MyHomePageState extends State<MyCalendarPage> with TickerProviderStateMix
   
         @override
         Widget build(BuildContext context) {
+          if(role == "teacher" || role == "principal") {
           return Scaffold(
+            appBar:AppBar(
+             title: Text("Event Calendar"),
+             backgroundColor: Colors.indigoAccent,
+             actions: <Widget>[
+               IconButton(
+                 icon: Icon(
+                   Icons.add,
+                  
+                 ), 
+                 onPressed:() {
+                   Navigator.push(context, 
+                    PageRouteBuilder(
+                     transitionDuration: Duration(seconds: 1),
+                     transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation, Widget child) {
+                       animation = CurvedAnimation(parent: animation, curve: Curves.elasticInOut);
+                       return ScaleTransition(
+                        scale: animation,
+                        child: child,
+                        alignment: Alignment.center,  
+                      );
+                     },
+                     pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation) {
+                      return addEvent();
+                    }
+                   )
+                   );
+                 },
+                )
+             ],
+
+             flexibleSpace: Container(
+               decoration: BoxDecoration(
+                 gradient: LinearGradient(
+                   begin: Alignment.topLeft,
+                   end: Alignment.bottomRight,
+                   colors: <Color>[
+                     Colors.blueAccent,
+                     Colors.indigo,
+                   ] 
+                 )
+               )
+             ),
+            ),
+            body: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(25.0), topRight: Radius.circular(25.0)),
+                ),
+                child: StreamBuilder(
+                stream: Firestore.instance.collection('events').snapshots(),
+                builder: (context, snapshot) {    
+                  if(snapshot.hasData) {
+                    List<String> myevents;
+                    List<String> myholiday;
+                    for(int i = 0; i < snapshot.data.documents.length; i++) {
+                      myevents = List<String>();
+                      myholiday = List<String>();
+                      for(int j = 1;  j <= snapshot.data.documents[i]['no_event']; j++) {
+                        myevents.add(snapshot.data.documents[i]['event' + j.toString()]); 
+                      }
+  
+
+                      for(int k = 1; k <= snapshot.data.documents[i]['no_holiday']; k++) {
+                        myholiday.add(snapshot.data.documents[i]['holiday' + k.toString()]);
+                        myevents.add(snapshot.data.documents[i]['holiday' + k.toString()]);
+                      }
+
+                      DateTime dt = snapshot.data.documents[i]['date'].toDate();
+                      if(myevents.isNotEmpty == true) 
+                        _events[dt] = myevents;
+                      if(myholiday.isNotEmpty == true)
+                        _holidays[dt] = myholiday;
+                    
+                    }
+                    if(flag == true) {
+                      _selectedEvents = _events[_selectedDay] ?? [];
+                      flag = false;
+                    }
+                    return Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      // Switch out 2 lines below to play with TableCalendar's settings
+                      //-----------------------
+                      _buildTableCalendar(),
+                      // _buildTableCalendarWithBuilders(),
+                      const SizedBox(height: 8.0),
+                      _buildButtons(),
+                      const SizedBox(height: 8.0),
+                      Expanded(child: _buildEventList()),
+                    ],
+                  ); 
+                }
+                else {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.redAccent,
+                    )
+                  );
+                }
+              }
+            ),),
+            floatingActionButton: buildSpeedDial(),
+          );
+          }
+          else if(role == "student") {
+            return Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.indigoAccent,
               title: Text(widget.title),
@@ -375,7 +492,16 @@ class _MyHomePageState extends State<MyCalendarPage> with TickerProviderStateMix
             ),),
             floatingActionButton: buildSpeedDial(),
           );
-      
+          }
+          else {
+            return Scaffold(
+              body:Center(
+                child:CircularProgressIndicator(
+                  backgroundColor: Colors.red,
+                  ) 
+              )
+            );
+          }
         // Simple TableCalendar configuration (using Styles)
       
         // More advanced TableCalendar configuration (using Builders & Styles)
