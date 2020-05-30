@@ -3,6 +3,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:myproject/addHoliday.dart';
 import 'package:myproject/homepage.dart';
 import 'package:myproject/main.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -328,28 +329,15 @@ class _MyHomePageState extends State<MyCalendarPage> with TickerProviderStateMix
              title: Text("Event Calendar"),
              backgroundColor: Colors.indigoAccent,
              actions: <Widget>[
-               IconButton(
-                 icon: Icon(
-                   Icons.add,
-                  
-                 ), 
-                 onPressed:() {
-                   Navigator.push(context, 
-                    PageRouteBuilder(
-                     transitionDuration: Duration(seconds: 1),
-                     transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation, Widget child) {
-                       animation = CurvedAnimation(parent: animation, curve: Curves.elasticInOut);
-                       return ScaleTransition(
-                        scale: animation,
-                        child: child,
-                        alignment: Alignment.center,  
-                      );
-                     },
-                     pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation) {
-                      return addEvent();
-                    }
-                   )
-                   );
+               PopupMenuButton<String>(
+                 onSelected: handleClick,
+                 itemBuilder: (BuildContext context) {
+                   return {'Add Event', 'Add Holiday'}.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(choice),
+                    );
+                   }).toList();   
                  },
                 )
              ],
@@ -374,6 +362,8 @@ class _MyHomePageState extends State<MyCalendarPage> with TickerProviderStateMix
                 child: StreamBuilder(
                 stream: Firestore.instance.collection('events').snapshots(),
                 builder: (context, snapshot) {    
+
+
                   if(snapshot.hasData) {
                     List<String> myevents;
                     List<String> myholiday;
@@ -510,5 +500,43 @@ class _MyHomePageState extends State<MyCalendarPage> with TickerProviderStateMix
       
   
       }
+      void handleClick(String value) {
+        if(value == 'Add Event') {
+          Navigator.push(context, 
+              PageRouteBuilder(
+                transitionDuration: Duration(seconds: 1),
+                transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation, Widget child) {
+                  animation = CurvedAnimation(parent: animation, curve: Curves.elasticInOut);
+                  return ScaleTransition(
+                  scale: animation,
+                  child: child,
+                  alignment: Alignment.center,  
+                );
+                },
+                pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation) {
+                return addEvent();
+              }
+              )
+              );
+        }
+        else if(value == 'Add Holiday') {
+          Navigator.push(context, 
+              PageRouteBuilder(
+                transitionDuration: Duration(seconds: 1),
+                transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation, Widget child) {
+                  animation = CurvedAnimation(parent: animation, curve: Curves.easeOutSine);
+                  return ScaleTransition(
+                  scale: animation,
+                  child: child,
+                  alignment: Alignment.center,  
+                );
+                },
+                pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation) {
+                  return addHoliday();
+                }
+              )
+              );
+        }
+    }
       
 }

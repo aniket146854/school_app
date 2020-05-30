@@ -14,7 +14,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -25,7 +25,7 @@ dependencies:
   curved_navigation_bar: ^0.3.1
   cupertino_icons: ^0.1.2
   cloud_firestore: ^0.13.3
-
+  flare_flutter: ^2.0.3
   sliding_up_panel: ^1.0.0
   flutter_clean_calendar: ^1.0.1
   draggable_floating_button: ^0.1.1
@@ -36,14 +36,19 @@ dependencies:
   font_awesome_flutter: ^8.2.0
   flutter_speed_dial: 
   shared_preferences: 
+  nice_button: ^0.1.7
   progress_dialog: ^1.2.1
   google_fonts: ^0.2.0
   flutter_multiselect: ^0.0.1
   flutter_form_builder: ^3.8.3
   multiselect_formfield: ^0.1.2
+  flutter_tagging: ^2.2.0+3
   flutter_progress_button: ^0.6.4
   connectivity: ^0.4.8 
   fluttertoast: ^4.0.1
+  imagebutton: ^0.0.6
+  flutter_read_more_text: ^0.0.1
+  smart_flare: 
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -69,6 +74,9 @@ flutter:
     - assets/Aniket.jpg
     - assets/blood.png
     - assets/school.png 
+    - assets/Navigation.svg
+    - assets/navigation.png
+    - assets/check_animation.flr
   fonts:
     - family: RobotoSlab
       fonts:

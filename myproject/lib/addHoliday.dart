@@ -13,18 +13,17 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flare_flutter/flare_actor.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'chcek_success.dart';
 
-class addEvent extends StatefulWidget {
+class addHoliday extends StatefulWidget {
   @override
-  addEventState createState() {
-    return new addEventState();
+  addHolidayState createState() {
+    return new addHolidayState();
   }
 }
 
-class addEventState extends State<addEvent> {
+class addHolidayState extends State<addHoliday> {
   DateTime mydate = DateTime.now().subtract(Duration(days: 1));
   String selected_date = 'Tap to select date';
   var current_date = DateTime.now();
@@ -58,7 +57,7 @@ class addEventState extends State<addEvent> {
       resizeToAvoidBottomInset: false,
       resizeToAvoidBottomPadding: false,
      appBar: AppBar(
-       title: Text("Add Event", style: TextStyle(color: Colors.black), textAlign: TextAlign.center,),
+       title: Text("Add Holiday", style: TextStyle(color: Colors.black), textAlign: TextAlign.center,),
        backgroundColor: Colors.white,
        leading: IconButton(
          icon: Icon(Icons.arrow_back, color: Colors.black,), 
@@ -124,7 +123,7 @@ class addEventState extends State<addEvent> {
             Container(
               width: MediaQuery.of(context).size.width,
               margin: EdgeInsets.only(left: 15.0, top: 20.0),
-              child: Text("What is Event?", style: TextStyle(color: Colors.pink, fontSize: 20.0), textAlign: TextAlign.start,),
+              child: Text("Why is holiday?", style: TextStyle(color: Colors.pink, fontSize: 20.0), textAlign: TextAlign.start,),
             ),
             
             Container(
@@ -134,8 +133,8 @@ class addEventState extends State<addEvent> {
                 autovalidate: true,
                 controller: _controller,
                 decoration: InputDecoration(
-                  hintText: 'What is event on '+ mystring,
-                  labelText: "Event"
+                  hintText: 'Why is holiday on '+ mystring,
+                  labelText: "Holiday"
                 )
               ),
             ),
@@ -146,7 +145,7 @@ class addEventState extends State<addEvent> {
               child: ProgressButton(
                 borderRadius: 10.0,
                 color: Colors.pink,
-                defaultWidget: const Text("Add Event", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0),),
+                defaultWidget: const Text("Add Holiday", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0),),
                 progressWidget: const CircularProgressIndicator(
                   backgroundColor: Colors.white,
                 ),
@@ -186,7 +185,7 @@ class addEventState extends State<addEvent> {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text("Error"),
-                              content: Text("Please enter event detail"),
+                              content: Text("Please enter holiday detail"),
                               actions:[
                                 FlatButton(
                                   child: Text("OK"),
@@ -201,23 +200,20 @@ class addEventState extends State<addEvent> {
                       }}
                       else{
                         Timestamp ts = Timestamp.fromDate(dt);
-                        var formatter = new DateFormat('dd-MM-yyyy');
-                        String formatted = formatter.format(dt);
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                        String myuser = prefs.get('id');
-                       // var mysnapshot = await Firestore.instance.collection("events").getDocuments();
+                        var mysnapshot = await Firestore.instance.collection("events").getDocuments();
+                        int length = mysnapshot.documents.length;
+                        length = length + 1;
                         var datasnpshot = await Firestore.instance.collection("events").where('date' , isEqualTo: ts).getDocuments();
                         if(datasnpshot.documents.length == 0) {
-                          await Firestore.instance.collection("events").document(formatted).setData({'date': ts, 'event1': _controller.text, 'no_event': 1, 'no_holiday': 0});
+                          await Firestore.instance.collection("events").document(length.toString()).setData({'date': ts, 'holiday1': _controller.text, 'no_event': 0, 'no_holiday': 1, 'count': length});
                         }
                         else {
-                          int value = datasnpshot.documents[0]['no_event'];
+                          int value = datasnpshot.documents[0]['no_holiday'];
                           value = value + 1;
-                          //int count = datasnpshot.documents[0]['count'];
-                          Firestore.instance.collection('events').document(formatted).updateData({'event' + value.toString() : _controller.text, 'no_event': value});
-                          
+                          int count = datasnpshot.documents[0]['count'];
+                          await Firestore.instance.collection("events").document(count.toString()).updateData({'holiday' + value.toString() : _controller.text, 'no_holiday': value});
                         }
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => checkSuccess(text: "Event is added Successfully")));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => checkSuccess(text: "Holiday is added Succesfully")));
                         //Navigator.pop(context);
                       }
                       

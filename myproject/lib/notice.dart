@@ -7,6 +7,7 @@ import 'package:myproject/reject_notices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:flare_flutter/flare_actor.dart';
 
 import 'addNotice.dart';
 
@@ -21,13 +22,15 @@ class noticeState extends State<notice> {
   String sender, subject, description;
   SharedPreferences prefs;
   String role;
-
+  String myname, myid;
   @override 
   void initState() {
     SharedPreferences.getInstance().then((onValue) {
       setState(() {
         prefs = onValue;
         role = prefs.getString('role');
+        myname = prefs.getString('name');
+        myid = prefs.getString('id');
       });
     });
     // TODO: implement initState
@@ -39,7 +42,9 @@ class noticeState extends State<notice> {
     if(prefs != null ) {
       if(role == "student") {
         return Scaffold(
+          
           body: SlidingUpPanel(
+            color: Colors.grey[50],
             minHeight: MediaQuery.of(context).size.height * 0.8,
             maxHeight: MediaQuery.of(context).size.height,
             panel: Container(
@@ -145,12 +150,12 @@ class noticeState extends State<notice> {
         else if(role == "teacher") {
           return Scaffold(
           body: SlidingUpPanel(
-            color: Color(0xffECEFF0),
+            color: Colors.grey[50],
             minHeight: MediaQuery.of(context).size.height * 0.8,
             maxHeight: MediaQuery.of(context).size.height,
             panel: Container(
               child: StreamBuilder(
-              stream: Firestore.instance.collection("Notice").where('sendto', whereIn: ['all', 'teacher']).snapshots(),
+              stream: Firestore.instance.collection("Notice").snapshots(),
               builder: (context, snapshot) {
                 if(!snapshot.hasData) {
                   return Container(
@@ -158,12 +163,32 @@ class noticeState extends State<notice> {
                   );
                 }
                 else {
+                  int count = 0;
+                  List<notice_add> myclass = [];
+                  
+                  for(int i = 0; i < snapshot.data.documents.length; i++) {
+                    List<String> names = List.from(snapshot.data.documents[i]['sendto']);
+                    Timestamp date = snapshot.data.documents[i]['date'];
+                    String description = snapshot.data.documents[i]['description'];
+                    String id = snapshot.data.documents[i]['id'];
+                    String name = snapshot.data.documents[i]['name'];
+                    String subject = snapshot.data.documents[i]['subject'];
+                    for(int j = 0; j < names.length; j++) {
+                      String value = names.elementAt(j);
+                      if((value == 'all' || value == 'teacher' || value == name ) && myid != id) {
+                        myclass.add(notice_add(mydate: date, description: description, id: id, name: name, subject: subject, names:names));
+                        count = count + 1;
+                        break;
+                      }
+                    }
+                  }
+                  
                   return Container(
                     margin: EdgeInsets.only(top: 20.0),
                     height: MediaQuery.of(context).size.height * 0.8,
                     child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data.documents.length,
+                      itemCount: count,
                         itemBuilder: (BuildContext context, int i) => 
                         Container(
                           height: 100.0,
@@ -173,15 +198,15 @@ class noticeState extends State<notice> {
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           child: ListTile(
                             onTap: () { 
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => noticeDescription(index: '$i', sender: snapshot.data.documents[i]['name'], subject: snapshot.data.documents[i]['subject'], description: snapshot.data.documents[i]['description'],sendto: snapshot.data.documents[i]['sendto'] , )));},
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => noticeDescription(index: '$i', sender: myclass.elementAt(i).name, subject: myclass.elementAt(i).subject,description: myclass.elementAt(i).description,sendto: myclass.elementAt(i).names,)));},
                             leading: ClipOval(
                               child: Hero(
                                 tag: 'Demo Tag' + '$i',
                                 child: Image.asset("assets/Aniket.jpg", width: 50.0, height: 50.0,),
                               )      
                             ),
-                            title: Text(snapshot.data.documents[i]['name'], overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.black, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 18.0),),
-                            subtitle: Text(snapshot.data.documents[i]['description'], style: TextStyle(color: Colors.black, fontFamily:"RobotoSlab-Regular.ttf", fontSize: 15.0), overflow: TextOverflow.ellipsis, ),
+                            title: Text(myclass.elementAt(i).name, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.black, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 18.0),),
+                            subtitle: Text(myclass.elementAt(i).description, style: TextStyle(color: Colors.black, fontFamily:"RobotoSlab-Regular.ttf", fontSize: 15.0), overflow: TextOverflow.ellipsis, ),
                             trailing: SizedBox(
                               height: MediaQuery.of(context).size.height,
                               child: Column(
@@ -189,13 +214,13 @@ class noticeState extends State<notice> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Container(
-                                      child: Text(getmyDate(snapshot.data.documents[i]['date']), style: TextStyle(color: Colors.grey, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 12.0),),
+                                      child: Text(getmyDate(myclass.elementAt(i).mydate), style: TextStyle(color: Colors.grey, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 12.0),),
                                     )
                                   ), 
                                   Expanded(
                                     child: Container(
                                       
-                                      child: Text(getmyTime(snapshot.data.documents[i]['date']), style: TextStyle(color: Colors.grey, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 12.0),),
+                                      child: Text(getmyTime(myclass.elementAt(i).mydate), style: TextStyle(color: Colors.grey, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 12.0),),
                                     )
                                   ), 
 
@@ -212,14 +237,7 @@ class noticeState extends State<notice> {
 
             body: Container(
               height: MediaQuery.of(context).size.height * 0.2,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors:<Color>[
-                    Colors.greenAccent,
-                    const Color(0xff207FF2),
-                  ]
-                )
-              ),
+              color: Colors.red,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 
@@ -235,7 +253,7 @@ class noticeState extends State<notice> {
                     margin: EdgeInsets.only(right: 10.0, top: 20.0),
                     child:InkWell(
                       onTap: () => Scaffold.of(context).openDrawer(),
-                      child: Image.asset("assets/navigation_image.png",alignment: Alignment.topRight,color: Colors.white,)
+                      child: Image.asset("assets/navigation.png",alignment: Alignment.topRight, width: 40.0, height: 40.0 ),
                     )
                   ),
                 ]
@@ -247,7 +265,7 @@ class noticeState extends State<notice> {
           ),
           floatingActionButton: SpeedDial(
             animatedIcon: AnimatedIcons.menu_close,
-            backgroundColor: const Color(0xff207FF2),
+            backgroundColor: Colors.red,
             elevation: 10.0,
             overlayColor: Colors.black12,
             overlayOpacity: 0.85,
@@ -258,6 +276,7 @@ class noticeState extends State<notice> {
                 child: Icon(Icons.add),
                 label: "Add new notice",
                 onTap: () {
+
                   Navigator.push(context, MaterialPageRoute(builder: (context) => addNotice()));
                 }
               ),
@@ -304,4 +323,21 @@ class noticeState extends State<notice> {
     return formatted;
   } 
   
+}
+
+class notice_add {
+  Timestamp mydate;
+  String description;
+  String id;
+  String name;
+  String subject;
+  List<String> names;
+  notice_add({
+    this.mydate,
+    this.description,
+    this.id,
+    this.name,
+    this.subject,
+    this.names,
+  });
 }

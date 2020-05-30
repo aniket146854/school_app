@@ -176,6 +176,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1+2"
+  flare_dart:
+    dependency: transitive
+    description:
+      name: flare_dart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.3.4"
+  flare_flutter:
+    dependency: "direct main"
+    description:
+      name: flare_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.3"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -230,6 +244,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.4"
+  flutter_read_more_text:
+    dependency: "direct main"
+    description:
+      name: flutter_read_more_text
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1"
   flutter_speed_dial:
     dependency: "direct main"
     description:
@@ -237,6 +258,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.5"
+  flutter_tagging:
+    dependency: "direct main"
+    description:
+      name: flutter_tagging
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.0+3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -256,6 +284,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.0"
+  flutter_typeahead_web:
+    dependency: transitive
+    description:
+      name: flutter_typeahead_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0+1"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -303,6 +338,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.4"
+  imagebutton:
+    dependency: "direct main"
+    description:
+      name: imagebutton
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.6"
   intl:
     dependency: transitive
     description:
@@ -338,6 +380,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2"
+  nice_button:
+    dependency: "direct main"
+    description:
+      name: nice_button
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.7"
   path:
     dependency: transitive
     description:
@@ -462,6 +511,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  smart_flare:
+    dependency: "direct main"
+    description:
+      name: smart_flare
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.9+1"
   source_span:
     dependency: transitive
     description:

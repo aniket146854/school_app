@@ -157,7 +157,6 @@ class _MyHomePageState extends State<loginPage> {
                       margin: EdgeInsets.only(top: 40.0),
                       width: MediaQuery.of(context).size.width * 0.9,
                       child: Card(
-                        color: Colors.grey.withOpacity(0.4),
                         elevation: 4.0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0)
@@ -235,37 +234,71 @@ class _MyHomePageState extends State<loginPage> {
           print(value);
           var datasnapshot;
           int myvalue = 1;
-          String name, roll_no, std, mobile1, mobile2, division, myaddress;
+          String name, roll_no, std, mobile1, mobile2, division, myaddress, id;
+
           
+          datasnapshot = await Firestore.instance.collection('Users').where('mobile', isEqualTo: this.phoneNo).getDocuments();
+          role = datasnapshot.documents[0]['Role'];
+          print(role);
           var query = await Firestore.instance.collection('Profile').where('mobile1', isEqualTo: value).getDocuments();
           if(query.documents.length == 0) {
             query = await Firestore.instance.collection('Profile').where('mobile2', isEqualTo: value).getDocuments();
           }
 
-          name = query.documents[0]['Name'];
-          roll_no = query.documents[0]['Roll_no'];
-          std = query.documents[0]['std'];
-          mobile1 = query.documents[0]['mobile1'];
-          mobile2 = query.documents[0]['mobile2'];
-          division = query.documents[0]['Division'];
-          myaddress = query.documents[0]['Address'];
-          
-          
-          final prefs = await SharedPreferences.getInstance();
-          final mobile1_t = 'mobile1';
-          final mobile2_t = 'mobile2';
-          final address_t = 'address';
-          final std_t = 'std';
-          final division_t = 'division';
-          final rollno_t = 'roll_no';
-          final name_t =  'name';
-          prefs.setString(mobile1_t, mobile1);
-          prefs.setString(mobile2_t, mobile2);
-          prefs.setString(address_t, myaddress);
-          prefs.setString(std_t, std);
-          prefs.setString(division_t, division);
-          prefs.setString(rollno_t, roll_no);
-          prefs.setString(name_t, name);
+          if(role == 'student') {
+            name = query.documents[0]['Name'];
+            roll_no = query.documents[0]['Roll_no'];
+            std = query.documents[0]['std'];
+            mobile1 = query.documents[0]['mobile1'];
+            mobile2 = query.documents[0]['mobile2'];
+            division = query.documents[0]['Division'];
+            myaddress = query.documents[0]['Address'];
+            
+            
+            final prefs = await SharedPreferences.getInstance();
+            final mobile1_t = 'mobile1';
+            final mobile2_t = 'mobile2';
+            final address_t = 'address';
+            final std_t = 'std';
+            final division_t = 'division';
+            final rollno_t = 'roll_no';
+            final name_t =  'name';
+            prefs.setString(mobile1_t, mobile1);
+            prefs.setString(mobile2_t, mobile2);
+            prefs.setString(address_t, myaddress);
+            prefs.setString(std_t, std);
+            prefs.setString(division_t, division);
+            prefs.setString(rollno_t, roll_no);
+            prefs.setString(name_t, name);
+          }
+          else if(role == 'teacher') {
+            print("Entered into teacher");
+            name = query.documents[0]['Name'];
+            id = query.documents[0]['id'].toString();
+            print(name);
+            print(id);
+            std = query.documents[0]['std'];
+            mobile1 = query.documents[0]['mobile1'];
+            mobile2 = query.documents[0]['mobile2'];
+            division = query.documents[0]['Division'];
+            myaddress = query.documents[0]['Address'];
+            print(name + id + std + mobile1 + mobile2 + division + myaddress);
+            final prefs = await SharedPreferences.getInstance();
+            final mobile1_t = 'mobile1';
+            final mobile2_t = 'mobile2';
+            final address_t = 'address';
+            final std_t = 'std';
+            final division_t = 'division';
+            final id_t = 'id';
+            final name_t =  'name';
+            prefs.setString(mobile1_t, mobile1);
+            prefs.setString(mobile2_t, mobile2);
+            prefs.setString(address_t, myaddress);
+            prefs.setString(std_t, std);
+            prefs.setString(division_t, division);
+            prefs.setString(id_t, id);
+            prefs.setString(name_t, name);
+          }
         }
         void showAlert(BuildContext context, String errormsg) {
           Alert(

@@ -120,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Icon(Icons.home, size: 30),
             Icon(Icons.people, size: 30),
             Icon(Icons.notifications, size: 30),
-            Icon(Icons.list, size: 30),
+            Icon(Icons.calendar_today, size: 30),
           ],
           onTap: (tappedIndex) {
             setState(() {
@@ -141,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   printValues() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String name = prefs.getString('name');
+    String name = prefs.getString('id');
     print(name);
   }
 }
