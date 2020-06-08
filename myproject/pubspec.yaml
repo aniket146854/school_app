@@ -48,7 +48,12 @@ dependencies:
   fluttertoast: ^4.0.1
   imagebutton: ^0.0.6
   flutter_read_more_text: ^0.0.1
+  carousel_slider: ^1.3.0
+  firebase_storage:
+  firebase_analytics:
+  flutter_staggered_grid_view: ^0.2.7
   smart_flare: 
+  video_player:
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -77,6 +82,8 @@ flutter:
     - assets/Navigation.svg
     - assets/navigation.png
     - assets/check_animation.flr
+    - assets/backspace.png
+    
   fonts:
     - family: RobotoSlab
       fonts:

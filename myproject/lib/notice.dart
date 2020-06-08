@@ -22,7 +22,7 @@ class noticeState extends State<notice> {
   String sender, subject, description;
   SharedPreferences prefs;
   String role;
-  String myname, myid;
+  String myname, myid, std, div;
   @override 
   void initState() {
     SharedPreferences.getInstance().then((onValue) {
@@ -31,6 +31,8 @@ class noticeState extends State<notice> {
         role = prefs.getString('role');
         myname = prefs.getString('name');
         myid = prefs.getString('id');
+        std = prefs.getString('std');
+        div = prefs.getString('division');
       });
     });
     // TODO: implement initState
@@ -49,7 +51,7 @@ class noticeState extends State<notice> {
             maxHeight: MediaQuery.of(context).size.height,
             panel: Container(
               child: StreamBuilder(
-              stream: Firestore.instance.collection("Notice").where('sendto', whereIn: ['all', '5']).snapshots(),
+              stream: Firestore.instance.collection("Notice").snapshots(),
               builder: (context, snapshot) {
                 if(!snapshot.hasData) {
                   return Container(
@@ -57,12 +59,35 @@ class noticeState extends State<notice> {
                   );
                 }
                 else {
+                  List<notice_add> mylist = [];
+                  int count = 0;
+                  for(int i = 0; i < snapshot.data.documents.length; i++) {
+                    List<String> names = List.from(snapshot.data.documents[i]['sendto']);
+                    Timestamp date = snapshot.data.documents[i]['date'];
+                    String description = snapshot.data.documents[i]['description'];
+                    String id = snapshot.data.documents[i]['id'];
+                    String name = snapshot.data.documents[i]['name'];
+                    String subject = snapshot.data.documents[i]['subject'];
+                    String mydiv = std + div;
+                    for(int j = 0; j < names.length; j++) {
+                      if((names.elementAt(j) == "all") || (std == names.elementAt(j)) || (mydiv == names.elementAt(j))) {
+                        count = count + 1;
+                        mylist.add(notice_add(description: description, id: id, name: name, subject: subject, names: names, mydate: date));
+                        break;
+                      }
+                    }
+                    mylist.sort((a, b){
+                      var adate = a.mydate;
+                      var bdate = b.mydate;
+                      return -adate.compareTo(bdate);
+                    });
+                  }
                   return Container(
                     margin: EdgeInsets.only(top: 20.0),
                     height: MediaQuery.of(context).size.height * 0.8,
                     child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data.documents.length,
+                      itemCount: count,
                         itemBuilder: (BuildContext context, int i) => 
                         Container(
                           height: 100.0,
@@ -72,15 +97,15 @@ class noticeState extends State<notice> {
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           child: ListTile(
                             onTap: () { 
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => noticeDescription(index: '$i', sender: snapshot.data.documents[i]['name'], subject: snapshot.data.documents[i]['subject'], description: snapshot.data.documents[i]['description'],sendto: snapshot.data.documents[i]['sendto'] , )));},
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => noticeDescription(index: '$i', sender: mylist.elementAt(i).name, subject: mylist.elementAt(i).subject, description: mylist.elementAt(i).description,sendto: mylist.elementAt(i).names , )));},
                             leading: ClipOval(
                               child: Hero(
                                 tag: 'Demo Tag' + '$i',
                                 child: Image.asset("assets/Aniket.jpg", width: 50.0, height: 50.0,),
                               )      
                             ),
-                            title: Text(snapshot.data.documents[i]['name'], overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.black, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 18.0),),
-                            subtitle: Text(snapshot.data.documents[i]['description'], style: TextStyle(color: Colors.black, fontFamily:"RobotoSlab-Regular.ttf", fontSize: 15.0), overflow: TextOverflow.ellipsis, ),
+                            title: Text(mylist.elementAt(i).name, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.black, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 18.0),),
+                            subtitle: Text(mylist.elementAt(i).description, style: TextStyle(color: Colors.black, fontFamily:"RobotoSlab-Regular.ttf", fontSize: 15.0), overflow: TextOverflow.ellipsis, ),
                             trailing: SizedBox(
                               height: MediaQuery.of(context).size.height,
                               child: Column(
@@ -88,13 +113,13 @@ class noticeState extends State<notice> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Container(
-                                      child: Text(getmyDate(snapshot.data.documents[i]['date']), style: TextStyle(color: Colors.grey, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 12.0),),
+                                      child: Text(getmyDate(mylist.elementAt(i).mydate), style: TextStyle(color: Colors.grey, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 12.0),),
                                     )
                                   ), 
                                   Expanded(
                                     child: Container(
                                       
-                                      child: Text(getmyTime(snapshot.data.documents[i]['date']), style: TextStyle(color: Colors.grey, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 12.0),),
+                                      child: Text(getmyTime(mylist.elementAt(i).mydate), style: TextStyle(color: Colors.grey, fontFamily:"RobotoSlab-Regular.ttf",fontWeight: FontWeight.bold, fontSize: 12.0),),
                                     )
                                   ), 
 
@@ -111,7 +136,6 @@ class noticeState extends State<notice> {
 
             body: Container(
               height: MediaQuery.of(context).size.height * 0.2,
-              color: Colors.indigoAccent.withOpacity(0.9),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors:<Color>[

@@ -8,6 +8,8 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import 'myOtpScreen.dart';
+
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
@@ -24,13 +26,13 @@ class loginPage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
+String smsCode;
+String verificationId;
+String role;
+String phoneNo;
 class _MyHomePageState extends State<loginPage> {
-  String phoneNo;
-  String smsCode;
-  String verificationId;
   int flag = 0;
   bool myflag;
-  static String role;
   TextEditingController _controller  = TextEditingController();
   
   Future<void> verifyPhone() async {
@@ -41,16 +43,13 @@ class _MyHomePageState extends State<loginPage> {
       print("No user");
     }
     final PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verId) {
-      this.verificationId = verId;
+      verificationId = verId;
     };
 
     final PhoneCodeSent smsCodeSent = (String verId, [int forceCodeResend]) {
       print("Inosde phoneCodeSent");      
-      this.verificationId = verId;
-      smsCodeDialog(context).then((value) {
-        print('Signed in');
-        flag = 1;
-      });
+      verificationId = verId;
+      Navigator.push(context, MaterialPageRoute(builder: (context) => OtpScreen()));
       
     };
 
@@ -63,7 +62,7 @@ class _MyHomePageState extends State<loginPage> {
    };
       
           await FirebaseAuth.instance.verifyPhoneNumber(
-              phoneNumber: this.phoneNo,
+              phoneNumber: phoneNo,
               codeAutoRetrievalTimeout: autoRetrieve,
               codeSent: smsCodeSent,
               timeout: const Duration(seconds: 5),
@@ -71,8 +70,7 @@ class _MyHomePageState extends State<loginPage> {
               verificationFailed: veriFailed);
         }
       
-        Future<bool> smsCodeDialog(BuildContext context) {
-          return showDialog(
+          /*return showDialog(
               context: context,
               barrierDismissible: false,
               builder: (BuildContext context) {
@@ -102,7 +100,7 @@ class _MyHomePageState extends State<loginPage> {
                   ],
                 );
               });
-        }
+        }*/
       
         signIn() async {
           final AuthCredential credential = PhoneAuthProvider.getCredential(
@@ -110,7 +108,7 @@ class _MyHomePageState extends State<loginPage> {
            smsCode: smsCode,
           );
       
-          String myphoneNo = this.phoneNo.substring(3);
+          String myphoneNo = phoneNo.substring(3);
           print(myphoneNo);
           var datasnapshot = await Firestore.instance.collection('Users').where('mobile', isEqualTo: myphoneNo).getDocuments();
           role = datasnapshot.documents[0]['Role'];
@@ -173,7 +171,7 @@ class _MyHomePageState extends State<loginPage> {
                               hintStyle: TextStyle(color: Colors.black)
                             ),
                             onChanged: (value) {
-                              this.phoneNo = value;
+                              phoneNo = value;
                             }
                         ))
                       ),
@@ -206,13 +204,13 @@ class _MyHomePageState extends State<loginPage> {
                             ),
                       ),
                       onPressed: () async{
-                        await Firestore.instance.collection('Users').document(this.phoneNo).get().then((onValue) {
+                        await Firestore.instance.collection('Users').document(phoneNo).get().then((onValue) {
                           if(!onValue.exists){
                           showAlert(context, "Your mobile number is not registered to our school!");
                           _controller.clear();
                         }
                         else {
-                          save(this.phoneNo);
+                          save(phoneNo);
                           verifyPhone();
                         }
                         });
@@ -237,7 +235,7 @@ class _MyHomePageState extends State<loginPage> {
           String name, roll_no, std, mobile1, mobile2, division, myaddress, id;
 
           
-          datasnapshot = await Firestore.instance.collection('Users').where('mobile', isEqualTo: this.phoneNo).getDocuments();
+          datasnapshot = await Firestore.instance.collection('Users').where('mobile', isEqualTo: phoneNo).getDocuments();
           role = datasnapshot.documents[0]['Role'];
           print(role);
           var query = await Firestore.instance.collection('Profile').where('mobile1', isEqualTo: value).getDocuments();
@@ -319,3 +317,6 @@ class _MyHomePageState extends State<loginPage> {
         }
 
 }
+
+
+  

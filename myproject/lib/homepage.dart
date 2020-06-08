@@ -16,6 +16,7 @@ class homepage extends StatefulWidget {
     return new homepageState();
   }
 }
+String name;
 class homepageState extends State<homepage> {
   String name;
   SharedPreferences prefs;
@@ -30,8 +31,10 @@ class homepageState extends State<homepage> {
         prefs = onValue;
         id = prefs.getString('id');
         std = prefs.getString('std');
-        div = prefs.getString('div');
+        div = prefs.getString('division');
         role = prefs.getString('role');
+        name = prefs.getString('name');
+        print(name);
       });
     });
     // TODO: implement initState
@@ -214,11 +217,7 @@ class homepageState extends State<homepage> {
                       Container(
                         margin: EdgeInsets.only(top: 20.0, left: 13.0),
                         child: Text("Your Tasks", style: TextStyle(fontSize: 18.0, fontFamily: "RobotoSlab-Regular.ttf", fontWeight:FontWeight.bold))),
-                        
-                      Container(
-                        margin: EdgeInsets.only(top: 20.0),
-                        child: Text("(6)", style: TextStyle(fontSize: 18.0, fontFamily: "RobotoSlab-Regular.ttf", fontWeight:FontWeight.bold, color: Colors.grey))
-                      )
+                      
                       ],
                     )
                   ],
@@ -227,60 +226,97 @@ class homepageState extends State<homepage> {
                 
                 
                 Expanded(
-                      child:Container(
-                      
-                      child: Padding(
-                      padding: EdgeInsets.all(13.0),
-                      child: ListView.builder(
-                        
-                        scrollDirection: Axis.vertical,
-                        itemCount: 6,
-                        itemBuilder: (BuildContext context, int i) =>
-                        Card(
-                          elevation: 1.5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                          child: Container(
-                            height: 80.0,
-                            padding: EdgeInsets.all(5),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children:<Widget>[
-                                Container(
-                                  alignment: Alignment.topLeft,
-                                  margin: EdgeInsets.only(left: 10.0),
-                                  child: Text("Maths", style: TextStyle(fontWeight: FontWeight.bold, fontFamily:"RobotoSlab-Regular.ttf", fontSize: 18.0,),)
-                                ),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Row(
-                                      children: <Widget>[                                 
-                                        Container(
-                                          margin: EdgeInsets.only(left:10.0),
-                                          child: Image.asset("assets/red_dot.png", fit: BoxFit.cover, height: 11, width: 11, color: Colors.redAccent,),
-                                        ),
+                    child: StreamBuilder(
+                      stream: Firestore.instance.collection('homework').snapshots(),
+                      builder: (context, snapshot) {
+                        if(snapshot.hasData) {  
+                            int count = 0;
+                            List<myclass> mylist = [];
+                            mylist.clear();
+                            for(int i = 0; i < snapshot.data.documents.length; i++) {
+                              String subject = snapshot.data.documents[i]['subject'];
+                              String description = snapshot.data.documents[i]['Description'];
+                              Timestamp ts = snapshot.data.documents[i]['deadline'];
+                              String standard = snapshot.data.documents[i]['std'].toString();
+                              String division = snapshot.data.documents[i]['div'];
+                              String sender = snapshot.data.documents[i]['added_by'];
+                              if(standard == std && division == div) {
+                                count = count + 1;
+                                mylist.add(myclass(subject: subject, description: description, deadline: ts, teacher: sender));
+                              }
+                            }
+                             mylist.sort((a, b){
+                              var adate = a.deadline;
+                              var bdate = b.deadline;
+                              return adate.compareTo(bdate);
+                            });
+                            return ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              itemCount: count,
+                              itemBuilder: (BuildContext context, int i) => 
+                              Container(
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => showTask(subject: mylist.elementAt(i).subject, task: mylist.elementAt(i).description, deadline: mylist.elementAt(i).deadline, added_by: mylist.elementAt(i).teacher)));
+                                  },
+                                  child:Card(
+                                  elevation: 5.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child:Container(
+                                    margin: EdgeInsets.only(left: 10),
+                                    padding: EdgeInsets.all(15.0),
+                                    height: 110.0,
+                                    width: MediaQuery.of(context).size.height,
+                                    child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: <Widget>[                                      
                                           Container(
-                                            margin: EdgeInsets.only(left:3.0),
-                                            child: Text("4 days left", style: TextStyle(fontWeight: FontWeight.bold, fontFamily:"RobotoSlab-Regular.ttf", fontSize: 15.0, color:Colors.grey),)
-                                        ),
-                                      ],
-                                    ),
-                                    
-                                    Container(
-                                      margin: EdgeInsets.only(right:10.0),
-                                      child: Text("Deadline", style: TextStyle(fontWeight: FontWeight.bold, fontFamily:"RobotoSlab-Regular.ttf", fontSize: 15.0, color:Colors.redAccent),)
+                                            width: MediaQuery.of(context).size.width,
+                                            child: Text(mylist.elementAt(i).subject,textAlign: TextAlign.start, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)),
+                                          ),
+                                          Container(
+                                            width: MediaQuery.of(context).size.width,
+                                            child: Text(mylist.elementAt(i).teacher, style: TextStyle(color: Colors.grey, fontSize: 16.0)),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              width: MediaQuery.of(context).size.width,
+                                              child: Text(mylist.elementAt(i).description, style: TextStyle(color: Colors.grey, fontSize: 16.0), overflow: TextOverflow.ellipsis),
+                                            )
+                                          ),
+                                          
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children:<Widget>[
+                                              Container(
+                                                child: Image.asset("assets/red_dot.png", width: 10.0, height: 10.0),
+                                              ),
+                                              Container(  
+                                                margin: EdgeInsets.only(left: 10.0),    
+                                                child: Text("Submit by " + getmyDate(mylist.elementAt(i).deadline)  , style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0, color: Colors.red)),
+                                              ),
+                                            ]
+                                          ),
+                                        ],
                                     )
-                                  ],
+                                  ))
                                 )
-                              ]
+                              
                             ),
-                          )
-                        )
-                      )
-                    ))),
+                          );
+                        }
+                        else {
+                          return Container(
+                            child: Center(
+                              child: Text("No Homework Added!", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25.0)),
+                            )
+                          );
+                        }
+                      },
+                    ),
+                  )
               ]
             ),
           )));}
@@ -335,7 +371,6 @@ class homepageState extends State<homepage> {
                               value = i;
                               flag = 1;
                               count = snapshot.data.documents[i]['no_lectures'];
-                              print('value = ' + value.toString() + "count = " + count.toString());
                             }
                           }
                           if(flag == 0) {
@@ -539,11 +574,12 @@ getmyDate(Timestamp timestamp) {
     String description;
     Timestamp deadline; 
     String division;
-
+    String teacher;
     myclass({
       this.subject, 
       this.description,
       this.deadline, 
       this.division,
+      this.teacher,
     });
   }

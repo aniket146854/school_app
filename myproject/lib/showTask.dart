@@ -11,9 +11,9 @@ import 'package:flutter_read_more_text/flutter_read_more_text.dart';
 import 'package:intl/intl.dart';
 
 class showTask extends StatelessWidget {
-  String subject, task, division;
+  String subject, task, division, added_by;
   Timestamp deadline;
-  showTask({Key key, @required this.subject, @required this.task, @required this.division, @required this.deadline}) : super(key: key);
+  showTask({Key key, @required this.subject, @required this.task, @required this.division, @required this.deadline, @required this.added_by}) : super(key: key);
   bool descTextShowFlag = false;
   @override
   Widget build(BuildContext context) {
@@ -60,13 +60,13 @@ class showTask extends StatelessWidget {
             Container(
               width: MediaQuery.of(context).size.width,
               margin: EdgeInsets.only(left: 15.0, top: 10.0),
-              child: Text("Sent To:", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.green),),
+              child: Text("Added by", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.green),),
             ),
 
             Container(
               width: MediaQuery.of(context).size.width,
               margin: EdgeInsets.only(left: 15.0, top: 10.0),
-              child: Text(division, style: TextStyle(fontSize: 20.0,  color: Colors.black),),
+              child: Text(added_by, style: TextStyle(fontSize: 20.0,  color: Colors.black),),
             ),
 
             Container(

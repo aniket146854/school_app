@@ -1,8 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:myproject/login_page.dart';
+import 'package:myproject/schoolEvent.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'aboutSchool.dart';
 import 'custom_navigation_drawer.dart';
 import 'package:flutter/material.dart';
+
+import 'homepage.dart';
+import 'main.dart';
 
 class CollapsingNavigationDrawer extends StatefulWidget {
   @override
@@ -19,9 +26,14 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
   AnimationController _animationController;
   Animation<double> widthAnimation;
   int currentSelectedIndex = 0;
-
+  SharedPreferences prefs;
+  String mobile1, mobile2;
   @override
   void initState() {
+    SharedPreferences.getInstance().then((onValue) {
+      mobile1 = onValue.getString('mobile1');
+      mobile2 = onValue.getString('mobile2');
+    });
     super.initState();
     _animationController = AnimationController(
         vsync: this, duration: Duration(milliseconds: 300));
@@ -45,7 +57,38 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
         color: drawerBackgroundColor,
         child: Column(
           children: <Widget>[
-            CollapsingListTile(title: 'Techie', icon: Icons.person, animationController: _animationController,),
+            Container(
+              margin: EdgeInsets.only(top: 20.0, left: 5.0),
+              child:ClipOval (
+                 child: Image.asset("assets/Aniket.jpg", fit: BoxFit.cover, height: 75, width: 75, alignment: Alignment.topLeft,),),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 5.0, left: 10.0),
+              child: StreamBuilder(
+                stream: Firestore.instance.collection('Profile').snapshots(),
+                builder: (context, snapshot) {
+                  if(snapshot.hasData) {
+                    String name = "";
+                    for(int i = 0; i < snapshot.data.documents.length; i++) {
+                      if(snapshot.data.documents[i]['mobile1'] == mobile1 && snapshot.data.documents[i]['mobile2'] == mobile2) {
+                        name = snapshot.data.documents[i]['Name'];
+                        break;
+                      }
+                    
+                    }
+                    return Container(
+                      child: Text(name, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20.0)),
+                    );
+                  }
+                  else {
+                    return Container();
+                  }
+                }
+              )
+            
+              
+              
+            ),
             Divider(color: Colors.grey, height: 40.0,),
             Expanded(
               child: ListView.separated(
@@ -56,9 +99,17 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                   return CollapsingListTile(
                       onTap: () {
                         setState(() {
-                          if(counter == 4) {
-                            signoutAccount();
-                            
+                          if(counter == 0) {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+                          }
+                          else if(counter == 1) {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => aboutSchool()));
+                          }
+                          else if(counter == 2) {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => schoolEvent()));
+                          }
+                          if(counter == 3) {
+                            signoutAccount();      
                           }
                           currentSelectedIndex = counter;
                         });
